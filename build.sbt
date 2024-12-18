@@ -40,12 +40,10 @@ lazy val root = (project in file(".")).
 
 lazy val dockerSettings = Seq(
   dockerRepository := Option("ghcr.io/yuelirex"),
-  dockerBaseImage := "ubuntu/jre:8-22.04_21",
+  dockerBaseImage := "ghcr.io/graalvm/graalvm-community:21.0.2",
   dockerPermissionStrategy := DockerPermissionStrategy.Run,
   dockerVersion := Some(DockerVersion(0, 0, 0, None)),
   Docker / packageName := "webhook-server",
-  Docker / daemonUserUid := None,
-  Docker / daemonUser := "daemon",
   Docker / version := version.value,
   dockerExposedPorts ++= Seq(8080),
 )
