@@ -16,8 +16,8 @@ lazy val root = (project in file(".")).
     )),
 
     name := "webhook-server",
+    version := "0.0.1",
     Compile / mainClass := Some("com.github.WebhookServer"),
-    dockerExposedPorts ++= Seq(8761, 7654),
 
     libraryDependencies ++= Seq(
       "org.apache.pekko" %% "pekko-http"                % pekkoHttpVersion,
@@ -39,18 +39,13 @@ lazy val root = (project in file(".")).
   ).enablePlugins(JavaAppPackaging, DockerPlugin)
 
 lazy val dockerSettings = Seq(
-  dockerRepository := Option("ghcr.io/YueLiRex"),
-  dockerBaseImage := "ghcr.io/graalvm/graalvm-community:21.0.2",
+  dockerRepository := Option("ghcr.io/yuelirex"),
+  dockerBaseImage := "ubuntu/jre:8-22.04_21",
   dockerPermissionStrategy := DockerPermissionStrategy.Run,
   dockerVersion := Some(DockerVersion(0, 0, 0, None)),
-  Docker / packageName := "demoapp",
-  Docker / version := version.value,
+  Docker / packageName := "webhook-server",
   Docker / daemonUserUid := None,
+  Docker / daemonUser := "daemon",
+  Docker / version := version.value,
   dockerExposedPorts ++= Seq(8080),
-  dockerAdditionalPermissions += (
-    DockerChmodType.Custom(
-      "+x"
-    ),
-    s"${(Docker / defaultLinuxInstallLocation).value}/bin/${executableScriptName.value}"
-  )
 )
