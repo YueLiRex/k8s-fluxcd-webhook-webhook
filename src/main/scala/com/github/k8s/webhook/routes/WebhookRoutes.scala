@@ -20,6 +20,10 @@ class WebhookRoutes()(implicit val system: ActorSystem[_]) extends FailFastCirce
       path("default-value") {
         post {
           entity(as[AdmissionReview]) { admissionReview =>
+            println("received request")
+            println(admissionReview)
+            println("====")
+
             val patch = Patch(
               op = "add", path = "/spec/replicas", value = 3
             )
