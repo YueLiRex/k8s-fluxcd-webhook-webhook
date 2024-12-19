@@ -1,5 +1,7 @@
 package com.github.k8s.webhook.routes
 
+import com.github.k8s.api.v1.AdmissionResponse.Patch
+import com.github.k8s.api.v1.{AdmissionResponse, AdmissionReview}
 import com.github.pjfanning.pekkohttpcirce.FailFastCirceSupport
 import io.k8s.api.apps.v1.Deployment
 import org.apache.pekko
@@ -15,30 +17,23 @@ class WebhookRoutes()(implicit val system: ActorSystem[_]) extends FailFastCirce
 
   val routes: Route =
     pathPrefix("webhook") {
-      path("defaultValue") {
+      path("default-value") {
         post {
-          entity(as[Deployment]) { deployment =>
-            val updatedDeployment = for {
-              dSpec <- deployment.spec
-              pTemplate <- deployment.spec.map(_.template)
-              containers <- deployment.spec.flatMap(_.template.spec.map(_.containers))
-            } yield {
-              val updatedCt = containers.map { c =>
-                c.copy(resources = Some(ResourceRequirements(
-                  requests = Some(Map("cpu" -> Quantity("500m"), "memory" -> Quantity("1024Mi"))),
-                  limits = Some(Map("cpu" -> Quantity("500m"), "memory" -> Quantity("1024Mi")))
-                )))
-              }
+          entity(as[AdmissionReview]) { admissionReview =>
+            val patch = Patch(
+              op = "add", path = "/spec/replicas", value = 3
+            )
 
-              println(updatedCt)
-
-              val updatedPtmp = pTemplate.copy(spec = pTemplate.spec.map(_.copy(containers = updatedCt)))
-              val updatedDp = dSpec.copy(template = updatedPtmp)
-
-              updatedDp
-            }
-
-            complete(StatusCodes.OK, updatedDeployment)
+            val response = AdmissionReview(request = None, response = Some(AdmissionResponse(
+              uid = admissionReview.request.flatMap(_.uid),
+              allowed = Some(true),
+              status = None,
+              patch = Some(patch.toBase64String),
+              patchType = Some("JSONPatch"),
+              auditAnnotations = None,
+              warnings = None
+            )))
+            complete(StatusCodes.OK, response)
           }
         }
       }
