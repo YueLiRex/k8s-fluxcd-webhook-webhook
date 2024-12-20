@@ -58,8 +58,10 @@ object AdmissionResponse {
     def toBase64String: Base64String = {
       val str =
         s"""
-          |{"op": $op, "path": $path, "value": $value}
+          |[{"op": $op, "path": $path, "value": $value}]
           |""".stripMargin
+
+      println(str)
 
       Base64.getEncoder.encodeToString(str.getBytes)
     }

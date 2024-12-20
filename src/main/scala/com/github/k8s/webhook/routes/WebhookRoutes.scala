@@ -10,8 +10,6 @@ import pekko.http.scaladsl.model.StatusCodes
 import pekko.http.scaladsl.server.Route
 import pekko.actor.typed.ActorSystem
 import dev.hnaderi.k8s.circe._
-import io.k8s.api.core.v1.ResourceRequirements
-import io.k8s.apimachinery.pkg.api.resource.Quantity
 
 class WebhookRoutes()(implicit val system: ActorSystem[_]) extends FailFastCirceSupport {
 
@@ -37,6 +35,7 @@ class WebhookRoutes()(implicit val system: ActorSystem[_]) extends FailFastCirce
               auditAnnotations = None,
               warnings = None
             )))
+
             complete(StatusCodes.OK, response)
           }
         }
