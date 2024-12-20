@@ -54,7 +54,7 @@ object AdmissionResponse {
     )
   }
 
-  case class Patch(op: String, path: String, value: AnyVal) {
+  case class Patch(op: String, path: String, value: Any) {
     def toBase64String: Base64String = {
       val str =
         s"""
