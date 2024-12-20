@@ -23,7 +23,7 @@ class WebhookRoutes()(implicit val system: ActorSystem[_]) extends FailFastCirce
             system.log.info("====")
 
             val patch = Patch(
-              op = "add", path = "/metadata/labels/isworked", value = "mutation-webhook-worked"
+              op = "replace", path = "/metadata/name", value = "mutation-webhook-worked"
             )
 
             val response = AdmissionReview(request = None, response = Some(AdmissionResponse(

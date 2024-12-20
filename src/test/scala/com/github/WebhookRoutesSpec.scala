@@ -42,7 +42,7 @@ class WebhookRoutesSpec extends AnyWordSpec with Matchers with ScalaFutures with
       val deployment = Deployment(spec = Some(DeploymentSpec(selector = LabelSelector(), template = PodTemplateSpec(spec = Some(PodSpec(containers = Seq(Container(name = "c1", image = Some("nginx")))))))))
       val deploymentEntity = Marshal(deployment).to[MessageEntity].futureValue
 
-      val request = Post("/webhook/defaultValue").withEntity(deploymentEntity)
+      val request = Post("/webhook/default-value").withEntity(deploymentEntity)
 
       request ~> webhookRoutes ~> check {
         status should === (StatusCodes.OK)
