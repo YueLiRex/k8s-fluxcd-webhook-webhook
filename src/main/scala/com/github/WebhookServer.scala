@@ -18,7 +18,7 @@ object WebhookServer {
     val password: Array[Char] = "change me".toCharArray // do not store passwords in code, read them from somewhere safe!
 
     val ks: KeyStore = KeyStore.getInstance("PKCS12")
-    val keystore: InputStream = getClass.getClassLoader.getResourceAsStream("server.p12")
+    val keystore: InputStream = getClass.getClassLoader.getResourceAsStream("keystore.p12")
 
     require(keystore != null, "Keystore required!")
     ks.load(keystore, password)
@@ -37,11 +37,11 @@ object WebhookServer {
   private def startHttpServer(routes: Route)(implicit system: ActorSystem[_]): Unit = {
 
     import system.executionContext
-    val futureBinding = Http().newServerAt("0.0.0.0", 8080).bind(routes)
+    val futureBinding = Http().newServerAt("0.0.0.0", 8080).enableHttps(loadHttpsContext).bind(routes)
     futureBinding.onComplete {
       case Success(binding) =>
         val address = binding.localAddress
-        system.log.info("Server online at http://{}:{}/", address.getHostString, address.getPort)
+        system.log.info("Server online at https://{}:{}/", address.getHostString, address.getPort)
       case Failure(ex) =>
         system.log.error("Failed to bind HTTP endpoint, terminating system", ex)
         system.terminate()
